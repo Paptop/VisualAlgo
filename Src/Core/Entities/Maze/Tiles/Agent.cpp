@@ -6,17 +6,20 @@
 Vi::Agent::Agent(Maze* maze)
 : Tile()
 , m_pcMaze(maze)
+, m_fProgress(0.0f)
 {
 	m_rect.setSize(sf::Vector2f(40, 40));
 	m_rect.setFillColor(sf::Color(255, 0, 255));
 	m_rect.setOutlineColor(sf::Color(255, 255, 0));
 	m_rect.setOutlineThickness(5.f);
 	m_rect.setPosition(0.0f, 0.0f);
+	m_text.setString("2");
+	m_id = 2;
 	m_eCurrentRule = IDLE;
 	m_vRules =
 	{
 //       U      R      D      L
-		{0,-1}, {1,0}, {0,1}, {-1,0}
+		{0,1}, {1,0}, {0,-1}, {-1,0}
 	};
 
 	GOM.Add(this);
@@ -70,6 +73,7 @@ void Vi::Agent::Update(float fDelta)
 				m_pIndex.y = newRow;
 
 				m_rect.setPosition(pos);
+				m_text.setPosition(pos);
 			}
 
 			m_eCurrentRule = IDLE;
@@ -81,4 +85,5 @@ void Vi::Agent::Update(float fDelta)
 void Vi::Agent::Render(Window* window)
 {
 	window->Draw(m_rect);
+	window->Draw(m_text);
 }

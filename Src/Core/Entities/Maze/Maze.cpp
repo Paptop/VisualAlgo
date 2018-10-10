@@ -16,6 +16,8 @@ Vi::Maze::Maze(std::string filename)
 	InitMaze();
 	InitObjects();
 	m_pcCamera = new Camera(this);
+	PrintToConsole();
+	WaveAlgo();
 }
 
 void Vi::Maze::Init()
@@ -25,28 +27,30 @@ void Vi::Maze::Init()
 
 Vi::Maze::~Maze()
 {
-	for (int i = 0; i < m_mazeGO.size(); ++i)
+	for (int i = 0; i < (int)m_mazeGO.size(); ++i)
 	{
-		for (int j = 0; j < m_mazeGO[i].size(); ++j)
+		for (int j = 0; j < (int)m_mazeGO[i].size(); ++j)
 		{
 			delete m_mazeGO[i][j];
 		}
 	}
 
 	delete m_pcCamera;
+	delete[] m_F;
 }
 
 void Vi::Maze::InitMaze()
 {
 	m_input.open(m_filename);
 	std::string line;
+
 	if (m_input.is_open())
 	{
 		while (getline(m_input, line))
 		{
 			std::vector<int> row;
 
-			for (int i = 0; i < line.length(); ++i)
+			for (int i = 0; i < (int)line.length(); ++i)
 			{
 				row.push_back(line[i] - '0');
 			}
@@ -55,17 +59,20 @@ void Vi::Maze::InitMaze()
 		} //getline
 
 	} // if open
-
+	std::reverse(m_maze.begin(), m_maze.end());
+	m_mazeW = m_maze[0].size();
+	m_mazeH = m_maze.size();
+	m_F = new sf::Vector2i[m_mazeH * m_mazeW];
 }
 
 void Vi::Maze::InitObjects()
 {
 	bool isAgent = false;
 
-	for (int i = 0; i < m_maze.size(); ++i)
+	for (int i = 0; i < (int)m_maze.size(); ++i)
 	{
 		std::vector<Tile*> tiles;
-		for (int j = 0; j < m_maze[i].size(); ++j)
+		for (int j = 0; j < (int)m_maze[i].size(); ++j)
 		{
 			int id = m_maze[i][j];
 			if (id == 2)
@@ -77,11 +84,11 @@ void Vi::Maze::InitObjects()
 			}
 
 			Tile* tile = CreateTile((Tiles)id, i, j);
-			tile->SetPosition(i,j);
+			tile->SetPosition(m_maze.size() - i,j);
 			tiles.push_back(tile);
 		}
 		m_mazeGO.push_back(tiles);
-	}
+    }
 
 	// Place agent on top
 	if (isAgent)
@@ -89,7 +96,7 @@ void Vi::Maze::InitObjects()
 		int sizeY = m_mazeGO.size() - 1;
 		Tile* tile = CreateTile(AGENT, m_agentY, m_agentX);
 		float x = tile->GetSize().x * m_agentX + kfOffset;
-		float y = tile->GetSize().y * m_agentY + kfOffset;
+		float y = tile->GetSize().y * (m_maze.size() - m_agentY) + kfOffset;
 		tile->SetPosition(Vector2(x, y));
 		m_mazeGO[sizeY].push_back(tile);
 	}
@@ -106,9 +113,9 @@ void Vi::Maze::PrintToConsole()
 	std::cout << "Y" << std::endl;
 	int size = (int)m_maze[0].size();
 
-	for (int i = 0; i < m_maze.size(); ++i)
+	for (int i = (int)m_maze.size() - 1; i >= 0; --i)
 	{
-		std::cout << " " << std::setfill(' ') << std::setw(3) << i << " | ";
+		std::cout << " " << std::setfill(' ') << std::setw(3) << i + 1 << " | ";
 		for (int c : m_maze[i])
 		{
 			std::cout << std::setfill(' ') << std::setw(4) << c;
@@ -163,12 +170,12 @@ Vi::Tile* Vi::Maze::CreateTile(Tiles id, int i, int j)
 
 Vi::Tile* Vi::Maze::GetTile(int row, int col)
 {
-	if (row >= m_mazeGO.size() || row < 0)
+	if (row >= static_cast<int>(m_mazeGO.size()) || row < 0)
 	{
 		return nullptr;
 	}
 
-	if(col >= m_mazeGO[row].size() || col < 0)
+	if(col >= static_cast<int>(m_mazeGO[row].size()) || col < 0)
 	{
 		return nullptr;
 	}
@@ -178,11 +185,54 @@ Vi::Tile* Vi::Maze::GetTile(int row, int col)
 
 void Vi::Maze::SetOffset(float fOffsetX, float fOffsetY)
 {
-	for (int i = 0; i < m_mazeGO.size(); ++i)
+	for (int i = 0; i < (int)m_mazeGO.size(); ++i)
 	{
-		for (int j = 0; j < m_mazeGO[i].size(); ++j)
+		for (int j = 0; j < (int)m_mazeGO[i].size(); ++j)
 		{
 			m_mazeGO[i][j]->SetOffset(fOffsetX, fOffsetY);
 		}
 	}
+}
+
+void Vi::Maze::WaveAlgo()
+{
+	bool Yes = false;
+	CLOSE = 0;
+	NEWN = 0;
+	m_F[0] = sf::Vector2i(m_agentX,m_agentY);
+	m_rules = { {-1, 0}, {0, -1}, {1, 0}, {0,1} };
+	do
+	{
+		int X = m_F[CLOSE].x;
+		int Y = m_F[CLOSE].y;
+		int K = 0;
+		do
+		{
+			int U = X + m_rules[K].x;
+			int V = Y + m_rules[K].y;
+			
+
+			if (m_mazeGO[V][U]->GetId() == 0)
+			{
+				int PrevId = m_mazeGO[Y][X]->GetId();
+				m_mazeGO[V][U]->SetId(PrevId + 1);
+				if (U == 0 || U == m_mazeW - 1 || V == 0 || V == m_mazeH - 1)
+				{
+					Yes = true;
+				}
+				else
+				{
+					m_F[NEWN] = sf::Vector2i(U, V);
+					NEWN = NEWN + 1;
+				}
+
+			}
+
+			K++;
+
+		} while (K < 3 && !Yes);
+
+		CLOSE++;
+	}
+	while (!Yes && CLOSE <= NEWN);
 }

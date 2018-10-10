@@ -3,6 +3,7 @@
 
 #include "Src/Vi/Go/GameObject.h"
 #include "Src/Vi/Global/Consts.h"
+#include "Src/Vi/Sys/ReManager.h"
 
 namespace Vi
 {
@@ -11,6 +12,11 @@ namespace Vi
 	public:
 		virtual bool IsSolid() = 0;
 		virtual int GetReward() = 0;
+
+		inline int GetId()
+		{
+			return m_id;
+		}
 
 		sf::Vector2f GetSize()
 		{ 
@@ -46,6 +52,7 @@ namespace Vi
 		void SetOffset(float x, float y)
 		{
 			m_rect.move(x, y);
+			m_text.move(x, y);
 		}
 
 		void SetColIndex(int x)
@@ -64,7 +71,23 @@ namespace Vi
 			m_pIndex.y = row;
 		}
 
+		void SetId(int id)
+		{
+			m_id = id;
+			m_text.setString(std::to_string(m_id));
+		}
+
+		Tile()
+		{
+			m_text.setFont(RE.GetFont());
+			m_text.setFillColor(sf::Color::Green);
+			m_text.setCharacterSize(20);
+			m_text.setOutlineColor(sf::Color::Black);
+			m_text.setOutlineThickness(1);
+			m_text.setStyle(sf::Text::Bold);
+		}
 	protected:
+		int m_id;
 		sf::RectangleShape m_rect;
 		sf::Text m_text;
 		// TODO Change to Vector2i in VI

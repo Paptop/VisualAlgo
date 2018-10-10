@@ -2,9 +2,11 @@
 
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <string>
 #include <fstream>
 #include "Src/Core/Model.h"
+#include "SFML/System/Vector2.hpp"
 
 namespace Vi
 {
@@ -31,6 +33,11 @@ namespace Vi
 		void SetOffset(float fOffsetX, float fOffsetY);
 
 		Tile* GetTile(int row, int col);
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
+		void WaveAlgo();
 	private:
 		void InitMaze();
 		void InitObjects();
@@ -46,5 +53,13 @@ namespace Vi
 
 		int m_agentY;
 		int m_agentX;
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+		sf::Vector2i* m_F;
+		std::vector< sf::Vector2i > m_rules;
+		int m_mazeW;
+		int m_mazeH;
+		int CLOSE;
+		int NEWN;
 	};
 }

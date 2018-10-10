@@ -43,12 +43,12 @@
     <ClInclude Include="Src\Core\Entities\Maze\Tiles\Wall.h" />
     <ClInclude Include="Src\Core\Model.h" />
     <ClInclude Include="Src\Core\Vi.h" />
-    <ClInclude Include="Src\Vi\Font\Header.h" />
     <ClInclude Include="Src\Vi\Global\Consts.h" />
     <ClInclude Include="Src\Vi\Math\ViMath.h" />
     <ClInclude Include="Src\Vi\Math\Vector2.h" />
     <ClInclude Include="Src\Vi\GO\GameObject.h" />
     <ClInclude Include="Src\Vi\Sys\GoManager.h" />
+    <ClInclude Include="Src\Vi\Sys\ReManager.h" />
     <ClInclude Include="Src\Vi\Sys\Window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

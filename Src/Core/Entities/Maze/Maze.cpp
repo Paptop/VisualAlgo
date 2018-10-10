@@ -222,15 +222,15 @@ void Vi::Maze::WaveAlgo()
 				}
 				else
 				{
-					m_F[NEWN] = sf::Vector2i(U, V);
 					NEWN = NEWN + 1;
+					m_F[NEWN] = sf::Vector2i(U, V);
 				}
 
 			}
 
 			K++;
 
-		} while (K < 3 && !Yes);
+		} while (K <= 3 && !Yes);
 
 		CLOSE++;
 	}

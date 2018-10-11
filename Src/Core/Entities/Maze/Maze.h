@@ -57,6 +57,8 @@ namespace Vi
 ///////////////////////////////////////////////////////////////////////////////////////
 		sf::Vector2i* m_F;
 		std::vector< sf::Vector2i > m_rules;
+		std::queue<sf::Vector2i> m_path;
+		std::ofstream m_output;
 		int m_mazeW;
 		int m_mazeH;
 		int CLOSE;

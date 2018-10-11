@@ -1,0 +1,116 @@
+WAVE 0, label L="2". Initial position X=5, Y=4, NEWN=1
+
+WAVE 1, label L="3"
+	Close Close=1, X=5, Y=4.
+  		R1. X=4, Y=4. Free. NEWN=2.
+  		R2. X=5, Y=3. Free. NEWN=3.
+  		R3. X=6, Y=4. Wall.
+  		R4. X=5, Y=5. Free. NEWN=4.
+
+WAVE 2, label L="4"
+	Close Close=2, X=4, Y=4.
+  		R1. X=3, Y=4. Free. NEWN=5.
+  		R2. X=4, Y=3. Free. NEWN=6.
+  		R3. X=5, Y=4. CLOSED or OPEN.
+  		R4. X=4, Y=5. Wall.
+
+	Close Close=3, X=5, Y=3.
+  		R1. X=4, Y=3. CLOSED or OPEN.
+  		R2. X=5, Y=2. Wall.
+  		R3. X=6, Y=3. Free. NEWN=7.
+  		R4. X=5, Y=4. CLOSED or OPEN.
+
+	Close Close=4, X=5, Y=5.
+  		R1. X=4, Y=5. Wall.
+  		R2. X=5, Y=4. CLOSED or OPEN.
+  		R3. X=6, Y=5. Wall.
+  		R4. X=5, Y=6. Free. NEWN=8.
+
+WAVE 3, label L="5"
+	Close Close=5, X=3, Y=4.
+  		R1. X=2, Y=4. Free. NEWN=9.
+  		R2. X=3, Y=3. Wall.
+  		R3. X=4, Y=4. CLOSED or OPEN.
+  		R4. X=3, Y=5. Wall.
+
+	Close Close=6, X=4, Y=3.
+  		R1. X=3, Y=3. Wall.
+  		R2. X=4, Y=2. Free. NEWN=10.
+  		R3. X=5, Y=3. CLOSED or OPEN.
+  		R4. X=4, Y=4. CLOSED or OPEN.
+
+	Close Close=7, X=6, Y=3.
+  		R1. X=5, Y=3. CLOSED or OPEN.
+  		R2. X=6, Y=2. Free. NEWN=11.
+  		R3. X=7, Y=3. Wall.
+  		R4. X=6, Y=4. Wall.
+
+	Close Close=8, X=5, Y=6.
+  		R1. X=4, Y=6. Free. NEWN=12.
+  		R2. X=5, Y=5. CLOSED or OPEN.
+  		R3. X=6, Y=6. Free. NEWN=13.
+  		R4. X=5, Y=7. Wall.
+
+WAVE 4, label L="6"
+	Close Close=9, X=2, Y=4.
+  		R1. X=1, Y=4. Wall.
+  		R2. X=2, Y=3. Free. NEWN=14.
+  		R3. X=3, Y=4. CLOSED or OPEN.
+  		R4. X=2, Y=5. Wall.
+
+	Close Close=10, X=4, Y=2.
+  		R1. X=3, Y=2. Free. NEWN=15.
+  		R2. X=4, Y=1. Wall.
+  		R3. X=5, Y=2. Wall.
+  		R4. X=4, Y=3. CLOSED or OPEN.
+
+	Close Close=11, X=6, Y=2.
+  		R1. X=5, Y=2. Wall.
+  		R2. X=6, Y=1. Wall.
+  		R3. X=7, Y=2. Wall.
+  		R4. X=6, Y=3. CLOSED or OPEN.
+
+	Close Close=12, X=4, Y=6.
+  		R1. X=3, Y=6. Free. NEWN=16.
+  		R2. X=4, Y=5. Wall.
+  		R3. X=5, Y=6. CLOSED or OPEN.
+  		R4. X=4, Y=7. Wall.
+
+	Close Close=13, X=6, Y=6.
+  		R1. X=5, Y=6. CLOSED or OPEN.
+  		R2. X=6, Y=5. Wall.
+  		R3. X=7, Y=6. Wall.
+  		R4. X=6, Y=7. Wall.
+
+WAVE 5, label L="7"
+	Close Close=14, X=2, Y=3.
+  		R1. X=1, Y=3. Wall.
+  		R2. X=2, Y=2. Free. NEWN=17.
+  		R3. X=3, Y=3. Wall.
+  		R4. X=2, Y=4. CLOSED or OPEN.
+
+	Close Close=15, X=3, Y=2.
+  		R1. X=2, Y=2. CLOSED or OPEN.
+  		R2. X=3, Y=1. Wall.
+  		R3. X=4, Y=2. CLOSED or OPEN.
+  		R4. X=3, Y=3. Wall.
+
+	Close Close=16, X=3, Y=6.
+  		R1. X=2, Y=6. Free. NEWN=18.
+  		R2. X=3, Y=5. Wall.
+  		R3. X=4, Y=6. CLOSED or OPEN.
+  		R4. X=3, Y=7. Wall.
+
+WAVE 6, label L="8"
+	Close Close=17, X=2, Y=2.
+  		R1. X=1, Y=2. Wall.
+  		R2. X=2, Y=1. Wall.
+  		R3. X=3, Y=2. CLOSED or OPEN.
+  		R4. X=2, Y=3. CLOSED or OPEN.
+
+	Close Close=18, X=2, Y=6.
+  		R1. X=1, Y=6. Wall.
+  		R2. X=2, Y=5. Wall.
+  		R3. X=3, Y=6. CLOSED or OPEN.
+  		R4. X=2, Y=7. Wall.
+

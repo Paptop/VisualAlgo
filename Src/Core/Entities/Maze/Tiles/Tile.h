@@ -77,6 +77,11 @@ namespace Vi
 			m_text.setString(std::to_string(m_id));
 		}
 
+		void SetColor(int r, int g, int b, int a)
+		{
+			m_rect.setFillColor(sf::Color(r,g,b,a));
+		}
+
 		Tile()
 		{
 			m_text.setFont(RE.GetFont());

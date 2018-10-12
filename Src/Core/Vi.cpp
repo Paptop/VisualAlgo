@@ -26,7 +26,7 @@ void Vi::ViAl::Start()
 void Vi::ViAl::Init()
 {
 	m_pcModel = new Maze("Maze.txt");
-	m_pcModel->PrintToConsole();
+
 }
 
 void Vi::ViAl::Loop()

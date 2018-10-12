@@ -3,9 +3,13 @@
 #include "Src/Vi/Global/Consts.h"
 #include "Src/Core/Entities/Maze/Camera.h"
 
+#include "SFML/Main.hpp"
 #include <algorithm>
 #include <iomanip>
 #include <cassert>
+#include <stdlib.h>  
+#include <random>
+#include <functional>
 
 
 Vi::Maze::Maze(std::string filename)
@@ -17,15 +21,25 @@ Vi::Maze::Maze(std::string filename)
 	InitMaze();
 	InitObjects();
 	m_pcCamera = new Camera(this);
+	std::cout << " Part 1 : Data" << std::endl << std::endl;
+	std::cout << "  1.1 Maze" << std::endl << std::endl;
 	PrintToConsole();
+	std::cout << std::endl;
+	std::cout << "  1.2 Initial position X=" << m_agentX << " , Y=" << m_agentY << ". L=2" << std::endl << std::endl;
+	std::cout << " Part 2 is located OUTPUT.TXT" << std::endl << std::endl;
 	WaveAlgo();
-
-
-	for (int i = 0; i < m_mazeW * m_mazeH; ++i)
+	std::cout << " Part 3 " << std::endl << std::endl;
+	std::cout << "  3.3 Rules: ";
+	for (int i = 0; i < m_R.size(); ++i)
 	{
-		std::cout << "i : " << i << " -> " << " x: " << m_F[i].x + 1 << " y: " << m_F[i].y + 1 << std::endl;
+		std::cout << "R" << m_R[i] << " ";
 	}
-
+	std::cout << std::endl << std::endl;
+	std::cout << "  3.4 Nodes: ";
+	for (int i = 0; i < m_nodes.size(); ++i)
+	{
+		std::cout << "[x=" << m_nodes[i].x + 1 << ", y=" << m_nodes[i].y + 1 << "]" << " ";
+	}
 
 }
 
@@ -67,11 +81,72 @@ void Vi::Maze::InitMaze()
 			m_maze.push_back(row);
 		} //getline
 
-	} // if open
+	}
+	else
+	{
+		GenMaze(25, 20);
+	}
 	std::reverse(m_maze.begin(), m_maze.end());
 	m_mazeW = m_maze[0].size();
 	m_mazeH = m_maze.size();
 	m_F = new sf::Vector2i[m_mazeH * m_mazeW];
+}
+
+void Vi::Maze::GenMaze(int row, int col)
+{
+	std::random_device r;
+	std::default_random_engine generator(r());
+	std::uniform_int_distribution<int> distribution(1, 6);
+
+	std::vector<int> firstRow;
+
+	auto dice = std::bind(distribution, generator);
+
+	for (int i = 0; i < col; ++i)
+	{
+		firstRow.push_back(1);
+	}
+
+	for (int i = 0; i < col; ++i)
+	{
+		int goal = dice();
+		if (goal == 6)
+		{
+			firstRow[i] = 0;
+		}
+	}
+
+	m_maze.push_back(firstRow);
+
+	for (int j = 1; j < row; ++j)
+	{
+		std::vector<int> y;
+		for (int i = 0; i < col; ++i)
+		{
+			int obs = dice();
+			if (obs <= 2)
+			{
+				y.push_back(1);
+			}
+			else
+			{
+				y.push_back(0);
+			}
+		}
+		y[0] = 1;
+		y[y.size() - 1] = 1;
+		m_maze.push_back(y);
+	}
+
+	for (int i = 0; i < col; ++i)
+	{
+		m_maze[m_maze.size() - 1][i] = 1;
+	}
+
+	int agentX = dice() % (col - 2) + 1;
+	int agentY = dice() % (row - 1) + (row / 2 - 1);
+	m_maze[agentY][agentX] = 2;
+
 }
 
 void Vi::Maze::InitObjects()
@@ -234,7 +309,7 @@ void Vi::Maze::WaveAlgo()
 
 			U = X + m_rules[K].x;
 			V = Y + m_rules[K].y;
-			
+
 			int id = m_mazeGO[Y][X]->GetId();
 
 			if (m_mazeGO[Y][X]->GetId() != waveLabel)
@@ -258,6 +333,7 @@ void Vi::Maze::WaveAlgo()
 			{
 				int PrevId = m_mazeGO[Y][X]->GetId();
 				m_mazeGO[V][U]->SetId(PrevId + 1);
+				m_mazeGO[V][U]->SetColor(215, 115, 115, 255);
 				waveLabel = PrevId;
 
 				if (U == 0 || U == m_mazeW - 1 || V == 0 || V == m_mazeH - 1)
@@ -293,6 +369,47 @@ void Vi::Maze::WaveAlgo()
 	}
 	while (!Yes && CLOSE <= NEWN);
 
+	if (Yes)
+	{
+		Back(U, V);
+	}
+}
 
-	std::cout << "Wave : " << waveCount << std::endl;
+
+void Vi::Maze::Back(int U, int V)
+{
+	int VV = 0;
+	int UU = 0;
+	int r = 0, g = 128, b = 255, a = 255;
+	m_mazeGO[V][U]->SetColor(r, g, b, a);
+	m_nodes.push_back(sf::Vector2i(U, V));
+
+	int flipedRules[] = { 3, 4, 1, 2 };
+
+	while (m_mazeGO[V][U]->GetId() != 2)
+	{
+		for (int i = 0; i < m_rules.size(); ++i)
+		{
+			UU = U + m_rules[i].x;
+			VV = V + m_rules[i].y;
+
+			if (UU >= 0 && UU < m_mazeW && VV >= 0 && VV < m_mazeH)
+			{
+				int newId = m_mazeGO[VV][UU]->GetId();
+				int oldId = m_mazeGO[V][U]->GetId();
+				if (newId == oldId - 1)
+				{
+					m_R.push_back(flipedRules[i]);
+					m_nodes.push_back(sf::Vector2i(UU, VV));
+					m_mazeGO[VV][UU]->SetColor(r, g, b, a);
+					U = UU;
+					V = VV;
+					break;
+				}
+			}
+		}
+	}
+
+	std::reverse(m_nodes.begin(), m_nodes.end());
+	std::reverse(m_R.begin(), m_R.end());
 }

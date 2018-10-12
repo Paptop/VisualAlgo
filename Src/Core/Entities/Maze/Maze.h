@@ -38,9 +38,11 @@ namespace Vi
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 		void WaveAlgo();
+		void Back(int U, int V);
 	private:
 		void InitMaze();
 		void InitObjects();
+		void GenMaze(int row, int col);
 		// TODO: create factory
 		Tile* CreateTile(Tiles id, int i, int j);
 	private:
@@ -59,6 +61,9 @@ namespace Vi
 		std::vector< sf::Vector2i > m_rules;
 		std::queue<sf::Vector2i> m_path;
 		std::ofstream m_output;
+		//Path
+		std::vector<int> m_R;
+		std::vector< sf::Vector2i > m_nodes;
 		int m_mazeW;
 		int m_mazeH;
 		int CLOSE;

@@ -51,6 +51,10 @@ void Vi::Agent::Update(float fDelta)
 		{
 			m_eCurrentRule = LEFT;
 		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+		{
+			m_pcMaze->WaveAlgo();
+		}
 
 		if (m_eCurrentRule != IDLE)
 		{

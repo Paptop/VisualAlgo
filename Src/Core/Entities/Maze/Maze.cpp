@@ -2,6 +2,7 @@
 #include "Src/Core/Entities/Maze/Tiles/Tiles.h"
 #include "Src/Vi/Global/Consts.h"
 #include "Src/Core/Entities/Maze/Camera.h"
+#include "Src/Vi/Sys/GoManager.h"
 
 #include "SFML/Main.hpp"
 #include <algorithm>
@@ -16,8 +17,12 @@ Vi::Maze::Maze(std::string filename)
 : m_filename(filename)
 , m_agentX(0)
 , m_agentY(0)
+, m_fProgress(0)
+, m_fDelay(0)
 {
 	m_output.open("OUTPUT.TXT");
+	GOM.Add(this);
+
 	InitMaze();
 	InitObjects();
 	m_pcCamera = new Camera(this);
@@ -27,7 +32,6 @@ Vi::Maze::Maze(std::string filename)
 	std::cout << std::endl;
 	std::cout << "  1.2 Initial position X=" << m_agentX << " , Y=" << m_agentY << ". L=2" << std::endl << std::endl;
 	std::cout << " Part 2 is located OUTPUT.TXT" << std::endl << std::endl;
-	WaveAlgo();
 	std::cout << " Part 3 " << std::endl << std::endl;
 	std::cout << "  3.3 Rules: ";
 	for (int i = 0; i < m_R.size(); ++i)
@@ -291,7 +295,6 @@ void Vi::Maze::WaveAlgo()
 	unsigned int waveCount = 0;
 	unsigned int waveLabel = 0;
 	int closePrev = -1;
-
 	int U = 0;
 	int V = 0;
 	m_output << "WAVE " << waveCount << ", label L=" << "\"" << 2 << "\"" << ". Initial position X=" << m_agentX+1 << ", Y=" << m_agentY+1 << ", NEWN=" << NEWN + 1 << std::endl;
@@ -315,6 +318,7 @@ void Vi::Maze::WaveAlgo()
 			if (m_mazeGO[Y][X]->GetId() != waveLabel)
 			{
 				m_output << "WAVE " << ++waveCount << ", label L=" << "\"" << id+1 << "\"" << std::endl;
+				m_anim.push_back(std::vector<Tile*>());
 			}
 			waveLabel = id;
 
@@ -333,13 +337,16 @@ void Vi::Maze::WaveAlgo()
 			{
 				int PrevId = m_mazeGO[Y][X]->GetId();
 				m_mazeGO[V][U]->SetId(PrevId + 1);
-				m_mazeGO[V][U]->SetColor(215, 115, 115, 255);
+				//m_mazeGO[V][U]->SetColor(215, 115, 115, 255)
+
+				m_anim.back().push_back(m_mazeGO[V][U]);
 				waveLabel = PrevId;
 
 				if (U == 0 || U == m_mazeW - 1 || V == 0 || V == m_mazeH - 1)
 				{
 					Yes = true;
 				}
+
 				else
 				{
 					NEWN = NEWN + 1;
@@ -373,6 +380,9 @@ void Vi::Maze::WaveAlgo()
 	{
 		Back(U, V);
 	}
+
+	std::reverse(m_anim.begin(), m_anim.end());
+	r = 235, g = 55, b = 55;
 }
 
 
@@ -412,4 +422,50 @@ void Vi::Maze::Back(int U, int V)
 
 	std::reverse(m_nodes.begin(), m_nodes.end());
 	std::reverse(m_R.begin(), m_R.end());
+
+
+}
+
+
+void Vi::Maze::Update(float fDelta)
+{
+
+	if (m_anim.size() > 0)
+	{
+		m_fDelay += fDelta;
+
+		if (m_fDelay > 0.05f)
+		{
+			m_fProgress += fDelta * 3.0f;
+			
+			if (m_fProgress > 0.5f)
+			{
+				// finish
+				for (Tile* tile : m_anim.back())
+				{
+					tile->SetLabelHidden(false);
+				}
+				m_anim.pop_back();
+				if (r > 100)
+				{
+					r -= 10;
+					b += 10;
+				}
+				m_fProgress = 0.0f;
+				m_fDelay = 0.0f;
+			}
+			else
+			{
+				float modProg = sinf(3.14159 * 0.5 * m_fProgress);
+				for (Tile* tile : m_anim.back())
+				{
+					tile->SetAlfa(r, g, b, modProg);
+				}
+			}
+
+			//m_fProgress = 0.0f;
+		}
+	}
+
+	//m_mazeGO[m_agentY][m_agentX]->SetAlfa(m_fProgress);
 }

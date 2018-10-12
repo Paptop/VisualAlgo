@@ -26,12 +26,13 @@ namespace Vi
 			GOAL = 3
 		};
 
+		void Update(float fDelta);
+	
 		Maze(std::string fileName);
 		~Maze();
 		void PrintToConsole();
 		void Init();
 		void SetOffset(float fOffsetX, float fOffsetY);
-
 		Tile* GetTile(int row, int col);
 
 
@@ -48,6 +49,7 @@ namespace Vi
 	private:
 		std::vector< std::vector<int> > m_maze;
 		std::vector< std::vector<Tile*> > m_mazeGO;
+		std::vector< std::vector<Tile*> > m_anim;
 
 		Camera* m_pcCamera;
 		std::ifstream m_input;
@@ -63,10 +65,16 @@ namespace Vi
 		std::ofstream m_output;
 		//Path
 		std::vector<int> m_R;
+
 		std::vector< sf::Vector2i > m_nodes;
 		int m_mazeW;
 		int m_mazeH;
 		int CLOSE;
 		int NEWN;
+
+		float m_fProgress;
+		float m_fDelay;
+
+		int r, g, b;
 	};
 }

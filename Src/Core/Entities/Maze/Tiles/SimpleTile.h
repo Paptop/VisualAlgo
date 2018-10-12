@@ -16,6 +16,9 @@ namespace Vi
 
 		void Update(float fDelta);
 		void Render(Window* window);
+	private:
+		float fProgress;
+		float fDelay;
 	};
 }
 

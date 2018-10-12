@@ -1,9 +1,10 @@
 #ifndef MODEL_H
 #define MODEL_H
+#include "Src/Vi/GO/GameObject.h"
 
 namespace Vi
 {
-	class Model
+	class Model : public GameObject
 	{
 	public:
 		virtual void Init() = 0;

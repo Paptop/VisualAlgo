@@ -12,6 +12,7 @@ namespace Vi
 	public:
 		virtual bool IsSolid() = 0;
 		virtual int GetReward() = 0;
+		virtual void IncrementDelay(float fDelta) {};
 
 		inline int GetId()
 		{
@@ -79,10 +80,29 @@ namespace Vi
 
 		void SetColor(int r, int g, int b, int a)
 		{
-			m_rect.setFillColor(sf::Color(r,g,b,a));
+			m_rect.setFillColor(sf::Color(r, g, b, a));
 		}
 
-		Tile()
+		void SetAlfa(float a)
+		{
+			float alfa = 0 + a * 255;
+			sf::Color c = m_rect.getFillColor();
+			c.a = alfa;
+			m_rect.setFillColor(c);
+		}
+
+		void SetAlfa(int r, int g, int b, float a)
+		{
+			float alfa = 0 + a * 255;
+			m_rect.setFillColor(sf::Color(r, g,b,alfa));
+		}
+
+		void SetLabelHidden(bool value)
+		{
+			m_isLabelHidden = value;
+		}
+
+		Tile() : m_isLabelHidden(true)
 		{
 			m_text.setFont(RE.GetFont());
 			m_text.setFillColor(sf::Color::Green);
@@ -97,6 +117,7 @@ namespace Vi
 		sf::Text m_text;
 		// TODO Change to Vector2i in VI
 		sf::Vector2i m_pIndex;
+		bool m_isLabelHidden;
 
 	};
 

@@ -20,11 +20,14 @@ Vi::SimpleTile::~SimpleTile()
 
 void Vi::SimpleTile::Update(float fDelta)
 {
-
 }
 
 void Vi::SimpleTile::Render(Window* window)
 {
 	window->Draw(m_rect);
-	window->Draw(m_text);
+
+	if (!m_isLabelHidden)
+	{
+		window->Draw(m_text);
+	}
 }

@@ -14,6 +14,8 @@ namespace Vi
 		bool IsSolid() { return true; }
 		int GetReward() { return 0; }
 
+		void Reset();
+		void Init();
 		void Update(float fDelta);
 		void Render(Window* window);
 	};

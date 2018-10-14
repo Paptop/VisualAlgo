@@ -12,7 +12,7 @@ namespace Vi
 	public:
 		virtual bool IsSolid() = 0;
 		virtual int GetReward() = 0;
-		virtual void IncrementDelay(float fDelta) {};
+		virtual void Reset(){}
 
 		inline int GetId()
 		{

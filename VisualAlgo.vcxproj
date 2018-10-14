@@ -41,6 +41,7 @@
     <ClInclude Include="Src\Core\Entities\Maze\Tiles\Tile.h" />
     <ClInclude Include="Src\Core\Entities\Maze\Tiles\Tiles.h" />
     <ClInclude Include="Src\Core\Entities\Maze\Tiles\Wall.h" />
+    <ClInclude Include="Src\Core\GUI\Dummy.h" />
     <ClInclude Include="Src\Core\Model.h" />
     <ClInclude Include="Src\Core\Vi.h" />
     <ClInclude Include="Src\Vi\Global\Consts.h" />

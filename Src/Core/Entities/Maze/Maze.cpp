@@ -47,6 +47,20 @@ Vi::Maze::Maze(std::string filename)
 
 }
 
+void Vi::Maze::Reset()
+{
+	m_anim.clear();
+
+	for (int i = 0; i < (int)m_maze.size(); ++i)
+	{
+		for (int j = 0; j < (int)m_maze[i].size(); ++j)
+		{
+			m_mazeGO[i][j]->Reset();
+		}
+	}
+	m_mazeGO[m_agentY][m_agentX]->SetId(2);
+}
+
 void Vi::Maze::Init()
 {
 	InitMaze();
@@ -88,7 +102,7 @@ void Vi::Maze::InitMaze()
 	}
 	else
 	{
-		GenMaze(25, 20);
+		GenM(30, 35);
 	}
 	std::reverse(m_maze.begin(), m_maze.end());
 	m_mazeW = m_maze[0].size();
@@ -96,7 +110,15 @@ void Vi::Maze::InitMaze()
 	m_F = new sf::Vector2i[m_mazeH * m_mazeW];
 }
 
-void Vi::Maze::GenMaze(int row, int col)
+void Vi::Maze::PlaceAgent(int row, int col)
+{
+	m_agentX = col;
+	m_agentY = row;
+	m_maze[row][col] = 2;
+	m_mazeGO[row][col]->SetId(2);
+}
+
+void Vi::Maze::GenM(int row, int col)
 {
 	std::random_device r;
 	std::default_random_engine generator(r());
@@ -151,6 +173,10 @@ void Vi::Maze::GenMaze(int row, int col)
 	int agentY = dice() % (row - 1) + (row / 2 - 1);
 	m_maze[agentY][agentX] = 2;
 
+	m_mazeW = m_maze[0].size();
+	m_mazeH = m_maze.size();
+	m_F = new sf::Vector2i[m_mazeH * m_mazeW];
+
 }
 
 void Vi::Maze::InitObjects()
@@ -187,7 +213,6 @@ void Vi::Maze::InitObjects()
 		float y = tile->GetSize().y * (m_maze.size() - m_agentY) + kfOffset;
 		tile->SetPosition(Vector2(x, y));
 		m_mazeGO[sizeY].push_back(tile);
-
 		m_mazeGO[m_agentY][m_agentX]->SetId(2);
 	}
 }
@@ -286,17 +311,18 @@ void Vi::Maze::SetOffset(float fOffsetX, float fOffsetY)
 
 void Vi::Maze::WaveAlgo()
 {
+	Reset();
 	bool Yes = false;
 	CLOSE = 0;
 	NEWN = 0;
 	m_F[0] = sf::Vector2i(m_agentX,m_agentY);
-	m_path.push(sf::Vector2i(m_agentX, m_agentY));
 	m_rules = { {-1, 0}, {0, -1}, {1, 0}, {0,1} };
 	unsigned int waveCount = 0;
 	unsigned int waveLabel = 0;
 	int closePrev = -1;
 	int U = 0;
 	int V = 0;
+	r = 235, g = 55, b = 55;
 	m_output << "WAVE " << waveCount << ", label L=" << "\"" << 2 << "\"" << ". Initial position X=" << m_agentX+1 << ", Y=" << m_agentY+1 << ", NEWN=" << NEWN + 1 << std::endl;
 	m_output << std::endl;
 
@@ -305,7 +331,6 @@ void Vi::Maze::WaveAlgo()
 		int X = m_F[CLOSE].x;
 		int Y = m_F[CLOSE].y;
 		int K = 0;
-		m_path.pop();
 
 		do
 		{
@@ -352,7 +377,6 @@ void Vi::Maze::WaveAlgo()
 					NEWN = NEWN + 1;
 					m_output << std::setfill(' ') << std::setw(5) << "		R" << K + 1 << ". X=" << U + 1 << ", Y=" << V + 1 << "." << " Free. NEWN=" << NEWN + 1 << "." << std::endl;
 					m_F[NEWN] = sf::Vector2i(U, V);
-					m_path.push(m_F[NEWN]);
 				}
 
 			}
@@ -382,7 +406,7 @@ void Vi::Maze::WaveAlgo()
 	}
 
 	std::reverse(m_anim.begin(), m_anim.end());
-	r = 235, g = 55, b = 55;
+	//std::reverse(m_path.begin(), m_path.end());
 }
 
 
@@ -393,6 +417,7 @@ void Vi::Maze::Back(int U, int V)
 	int r = 0, g = 128, b = 255, a = 255;
 	m_mazeGO[V][U]->SetColor(r, g, b, a);
 	m_nodes.push_back(sf::Vector2i(U, V));
+	m_path.push_back(m_mazeGO[V][U]);
 
 	int flipedRules[] = { 3, 4, 1, 2 };
 
@@ -411,7 +436,8 @@ void Vi::Maze::Back(int U, int V)
 				{
 					m_R.push_back(flipedRules[i]);
 					m_nodes.push_back(sf::Vector2i(UU, VV));
-					m_mazeGO[VV][UU]->SetColor(r, g, b, a);
+					//m_mazeGO[VV][UU]->SetColor(r, g, b, a);
+					m_path.push_back(m_mazeGO[VV][UU]);
 					U = UU;
 					V = VV;
 					break;
@@ -422,8 +448,6 @@ void Vi::Maze::Back(int U, int V)
 
 	std::reverse(m_nodes.begin(), m_nodes.end());
 	std::reverse(m_R.begin(), m_R.end());
-
-
 }
 
 
@@ -437,12 +461,15 @@ void Vi::Maze::Update(float fDelta)
 		if (m_fDelay > 0.05f)
 		{
 			m_fProgress += fDelta * 3.0f;
-			
-			if (m_fProgress > 0.5f)
+			float modProg = sinf(3.14159 * 0.5 * m_fProgress);
+
+			if (m_fProgress > 0.6f)
 			{
+
 				// finish
 				for (Tile* tile : m_anim.back())
 				{
+					tile->SetAlfa(r, g, b, modProg);
 					tile->SetLabelHidden(false);
 				}
 				m_anim.pop_back();
@@ -456,16 +483,43 @@ void Vi::Maze::Update(float fDelta)
 			}
 			else
 			{
-				float modProg = sinf(3.14159 * 0.5 * m_fProgress);
 				for (Tile* tile : m_anim.back())
 				{
 					tile->SetAlfa(r, g, b, modProg);
 				}
 			}
+		}
+	}
+	else
+	{
+		if (m_path.size() > 0)
+		{
+			m_fDelay += fDelta;
 
-			//m_fProgress = 0.0f;
+			if (m_fDelay > 0.5f)
+			{
+				m_path.back()->SetColor(255, 250, 0, 255);
+				m_path.pop_back();
+				m_fDelay = 0.0f;
+			}
+		}
+	}
+}
+
+void Vi::Maze::GenMaze()
+{
+	delete[] m_F;
+	m_maze.clear();
+	GenM(30, 35);
+
+	for (int i = 0; i < (int)m_mazeGO.size(); ++i)
+	{
+		for (int j = 0; j < (int)m_mazeGO[i].size(); ++j)
+		{
+			delete m_mazeGO[i][j];
 		}
 	}
 
-	//m_mazeGO[m_agentY][m_agentX]->SetAlfa(m_fProgress);
+	m_mazeGO.clear();
+	InitObjects();
 }

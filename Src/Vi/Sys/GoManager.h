@@ -17,6 +17,7 @@ namespace Vi
 			return manager;
 		}
 
+		void AddFront(GameObject* go);
 		void Add(GameObject* go);
 		void Remove(GameObject* go);
 		void Update(float fDeltaTime);

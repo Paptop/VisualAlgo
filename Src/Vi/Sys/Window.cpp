@@ -5,6 +5,7 @@
 Vi::Window::Window()
 {
 	m_pcWindow = new sf::RenderWindow(sf::VideoMode(iPxWidth, iPxHeight), "VI");
+	m_pcWindow->setVerticalSyncEnabled(true);
 }
 
 Vi::Window::~Window()

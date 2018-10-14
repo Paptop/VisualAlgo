@@ -33,6 +33,9 @@ namespace Vi
 		void PrintToConsole();
 		void Init();
 		void SetOffset(float fOffsetX, float fOffsetY);
+		void Reset();
+		void PlaceAgent(int row, int col);
+		void GenMaze();
 		Tile* GetTile(int row, int col);
 
 
@@ -41,9 +44,9 @@ namespace Vi
 		void WaveAlgo();
 		void Back(int U, int V);
 	private:
+		void GenM(int x, int y);
 		void InitMaze();
 		void InitObjects();
-		void GenMaze(int row, int col);
 		// TODO: create factory
 		Tile* CreateTile(Tiles id, int i, int j);
 	private:
@@ -61,7 +64,7 @@ namespace Vi
 ///////////////////////////////////////////////////////////////////////////////////////
 		sf::Vector2i* m_F;
 		std::vector< sf::Vector2i > m_rules;
-		std::queue<sf::Vector2i> m_path;
+		std::vector<Tile*> m_path;
 		std::ofstream m_output;
 		//Path
 		std::vector<int> m_R;

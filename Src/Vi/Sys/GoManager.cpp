@@ -7,6 +7,11 @@ void Vi::GoManager::Add(GameObject* go)
 	m_lGameObjects.push_back(go);
 }
 
+void Vi::GoManager::AddFront(GameObject* go)
+{
+	m_lGameObjects.push_front(go);
+}
+
 void Vi::GoManager::Remove(GameObject* go)
 {
 	auto iter = std::find(m_lGameObjects.begin(), m_lGameObjects.end(), go);
@@ -15,6 +20,7 @@ void Vi::GoManager::Remove(GameObject* go)
 		m_lGameObjects.remove(*iter);
 	}
 }
+
 
 void Vi::GoManager::Update(float fDeltatime)
 {

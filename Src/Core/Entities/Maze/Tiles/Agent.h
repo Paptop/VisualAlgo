@@ -18,6 +18,7 @@ namespace Vi
 			DOWN,
 			LEFT,
 			IDLE,
+			PLACE,
 			COUNT
 		};
 
@@ -29,6 +30,9 @@ namespace Vi
 
 		void Update(float fDelta);
 		void Render(Window* window);
+		void Reset();
+		void Init();
+
 	private:
 		std::vector< sf::Vector2i > m_vRules;
 		RULES						m_eCurrentRule;

@@ -8,20 +8,8 @@ Vi::Agent::Agent(Maze* maze)
 , m_pcMaze(maze)
 , m_fProgress(0.0f)
 {
-	m_rect.setSize(sf::Vector2f(40, 40));
-	m_rect.setFillColor(sf::Color(255, 0, 255));
-	m_rect.setOutlineColor(sf::Color(255, 255, 0));
-	m_rect.setOutlineThickness(5.f);
+	Init();
 	m_rect.setPosition(0.0f, 0.0f);
-	m_text.setString("2");
-	m_id = 2;
-	m_eCurrentRule = IDLE;
-	m_vRules =
-	{
-//       U      R      D      L
-		{0,1}, {1,0}, {0,-1}, {-1,0}
-	};
-
 	GOM.Add(this);
 }
 
@@ -53,10 +41,10 @@ void Vi::Agent::Update(float fDelta)
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 		{
-			m_pcMaze->WaveAlgo();
+			m_eCurrentRule = PLACE;
 		}
 
-		if (m_eCurrentRule != IDLE)
+		if (m_eCurrentRule != IDLE && m_eCurrentRule != PLACE)
 		{
 			int newRow = m_pIndex.y + m_vRules[m_eCurrentRule].y;
 			int newCol = m_pIndex.x + m_vRules[m_eCurrentRule].x;
@@ -82,6 +70,10 @@ void Vi::Agent::Update(float fDelta)
 
 			m_eCurrentRule = IDLE;
 		}
+		else if (m_eCurrentRule == PLACE)
+		{
+			m_pcMaze->PlaceAgent(m_pIndex.y, m_pIndex.x);
+		}
 		m_fProgress = 0.0f;
 	}
 }
@@ -90,4 +82,28 @@ void Vi::Agent::Render(Window* window)
 {
 	window->Draw(m_rect);
 	window->Draw(m_text);
+}
+
+
+void Vi::Agent::Reset()
+{
+	Init();
+}
+
+void Vi::Agent::Init()
+{
+	m_rect.setSize(sf::Vector2f(40, 40));
+	m_rect.setFillColor(sf::Color(255, 0, 255));
+	m_rect.setOutlineColor(sf::Color(255, 255, 0));
+	m_rect.setOutlineThickness(5.f);
+	m_text.setString("2");
+	m_id = 2;
+
+	m_eCurrentRule = IDLE;
+	m_vRules =
+	{
+	   //       U      R      D      L
+	   {0,1}, {1,0}, {0,-1}, {-1,0}
+	};
+
 }

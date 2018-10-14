@@ -14,6 +14,7 @@ namespace Vi
 		bool PollEvent(sf::Event& event);
 		void Diplay();
 		void Draw(const sf::Drawable& drawable);
+		sf::Vector2i GetMousePos() { return sf::Mouse::getPosition(*m_pcWindow); }
 
 		Window();
 		~Window();

@@ -49,6 +49,8 @@ void Vi::Agent::Update(float fDelta)
 			int newRow = m_pIndex.y + m_vRules[m_eCurrentRule].y;
 			int newCol = m_pIndex.x + m_vRules[m_eCurrentRule].x;
 
+			float dist = GetDistance(*m_pcMaze->m_goal);
+			//std::cout << dist << std::endl;
 			Tile* tile = m_pcMaze->GetTile(newRow, newCol);
 			if (!tile)
 			{

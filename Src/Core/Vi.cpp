@@ -48,7 +48,7 @@ void Vi::ViAl::Loop()
 		float current = clock.getElapsedTime().asSeconds();
 		float delta = current - lastTime;
 		float fps = 1.f / delta;
-		std::cout << "Fps : " << fps << std::endl;
+		//std::cout << "Fps : " << fps << std::endl;
 		GOM.Update(delta);
 		m_pcWindow->Clear();
 		GOM.Render(m_pcWindow);

@@ -111,6 +111,18 @@ namespace Vi
 			m_text.setOutlineThickness(1);
 			m_text.setStyle(sf::Text::Bold);
 		}
+
+		float GetDistance(Tile& tile)
+		{
+			sf::Vector2i target = tile.GetIndex();
+			sf::Vector2i source = m_pIndex;
+			int diffX = target.x - source.x;
+			int diffY = target.y - source.y;
+
+			float dist = sqrt(diffX * diffX + diffY * diffY);
+			return dist;
+		}
+
 	protected:
 		int m_id;
 		sf::RectangleShape m_rect;

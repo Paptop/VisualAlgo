@@ -272,6 +272,7 @@ Vi::Tile* Vi::Maze::CreateTile(Tiles id, int i, int j)
 			break;
 		case GOAL:
 			tile = new GoalTile();
+			m_goal = tile;
 			break;
 		default:
 			assert(false);
@@ -510,7 +511,7 @@ void Vi::Maze::GenMaze()
 {
 	delete[] m_F;
 	m_maze.clear();
-	GenM(30, 35);
+	GenM(200, 150);
 
 	for (int i = 0; i < (int)m_mazeGO.size(); ++i)
 	{
@@ -522,4 +523,135 @@ void Vi::Maze::GenMaze()
 
 	m_mazeGO.clear();
 	InitObjects();
+}
+
+
+void Vi::Maze::Astar()
+{
+	Reset();
+	bool Yes = false;
+	CLOSE = 0;
+	NEWN = 0;
+	m_F[0] = sf::Vector2i(m_agentX, m_agentY);
+	m_rules = { {-1, 0}, {0, -1}, {1, 0}, {0,1} };
+	unsigned int waveCount = 0;
+	unsigned int waveLabel = 0;
+	int closePrev = -1;
+	int U = 0;
+	int V = 0;
+	r = 235, g = 55, b = 55;
+	m_output << "WAVE " << waveCount << ", label L=" << "\"" << 2 << "\"" << ". Initial position X=" << m_agentX + 1 << ", Y=" << m_agentY + 1 << ", NEWN=" << NEWN + 1 << std::endl;
+	m_output << std::endl;
+
+	std::multimap<float, sf::Vector2i> queue;
+	std::multimap<float, sf::Vector2i> closeQueue;
+	queue.insert({ 0, sf::Vector2i(m_agentX, m_agentY) });
+	do
+	{
+		int X = queue.begin()->second.x;
+		int Y = queue.begin()->second.y;
+		int K = 0;
+
+		
+		for (auto p : queue)
+		{
+			std::cout << "First ->" << p.first << " Second -> " << " X : " << p.second.x << " Y : " << p.second.y << " Goal -> " << m_goal->GetId() << std::endl;
+		}
+
+		do
+		{
+			U = X + m_rules[K].x;
+			V = Y + m_rules[K].y;
+
+			int id = m_mazeGO[Y][X]->GetId();
+			
+			if (id == 8)
+			{
+				std::cout << " ID " << id << std::endl;
+			}
+
+			if (m_mazeGO[Y][X]->GetId() != waveLabel)
+			{
+				m_output << "WAVE " << ++waveCount << ", label L=" << "\"" << id + 1 << "\"" << std::endl;
+				m_anim.push_back(std::vector<Tile*>());
+			}
+			waveLabel = id;
+
+			if (closePrev != CLOSE)
+			{
+				m_output << std::setfill(' ') << std::setw(5) << "	Close " << "Close=" << CLOSE + 1 << ", X=" << X + 1 << ", Y=" << Y + 1 << "." << std::endl;
+			}
+			closePrev = CLOSE;
+
+			if (m_mazeGO[V][U]->GetId() > 1)
+			{
+				m_output << std::setfill(' ') << std::setw(5) << "		R" << K + 1 << ". X=" << U + 1 << ", Y=" << V + 1 << "." << " CLOSED or OPEN." << std::endl;
+			}
+
+			if (m_mazeGO[V][U]->GetId() == 0)
+			{
+				int PrevId = m_mazeGO[Y][X]->GetId();
+				m_mazeGO[V][U]->SetId(PrevId + 1);
+				//m_mazeGO[V][U]->SetColor(215, 115, 115, 255)
+
+				m_anim.back().push_back(m_mazeGO[V][U]);
+				waveLabel = PrevId;
+
+				if (U == 0 || U == m_mazeW - 1 || V == 0 || V == m_mazeH - 1)
+				{
+					Yes = true;
+				}
+				else
+				{
+					NEWN = NEWN + 1;
+					m_output << std::setfill(' ') << std::setw(5) << "		R" << K + 1 << ". X=" << U + 1 << ", Y=" << V + 1 << "." << " Free. NEWN=" << NEWN + 1 << "." << std::endl;
+					//m_F[NEWN] = sf::Vector2i(U, V);
+					float dist = m_mazeGO[V][U]->GetDistance(*m_goal);
+					//std::cout << dist << std::endl;
+					closeQueue.insert({ dist,sf::Vector2i(U,V) });
+				}
+
+			}
+
+			if (m_mazeGO[V][U]->GetId() == 1)
+			{
+				m_output << std::setfill(' ') << std::setw(5) << "		R" << K + 1 << ". X=" << U + 1 << ", Y=" << V + 1 << "." << " Wall." << std::endl;
+			}
+
+
+
+			K++;
+
+		} while (K <= 3 && !Yes);
+
+		if (Yes)
+		{
+			m_output << std::setfill(' ') << std::setw(5) << "		R" << K << ". X=" << U + 1 << ", Y=" << V + 1 << "." << " Free. NEWN=" << NEWN + 2 << "." << " Terminal." << std::endl;
+			break;
+		}
+		m_output << std::endl;
+
+		if (closeQueue.size() == 0)
+		{
+			break;
+		}
+
+		if (queue.begin() != queue.end())
+		{
+			//queue.clear();
+			queue.erase(queue.begin());
+			queue.insert(*closeQueue.begin());
+			closeQueue.erase(closeQueue.begin());
+		}
+		//CLOSE++;
+
+	} while (!Yes && queue.size() > 0);
+
+	if (Yes)
+	{
+		Back(U, V);
+	}
+
+	std::reverse(m_anim.begin(), m_anim.end());
+	//std::reverse(m_path.begin(), m_path.end());
 }

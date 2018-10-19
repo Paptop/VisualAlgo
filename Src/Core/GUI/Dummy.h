@@ -18,25 +18,30 @@ namespace Vi
 
 		virtual void Render(Window* pcWindow)
 		{
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			m_fProgress += 0.1;
+			if (m_fProgress > 0.6)
 			{
-				sf::Vector2i position = pcWindow->GetMousePos();
-				sf::Vector2f bPosition = m_rect.getPosition();
-				int maxY = bPosition.y + m_height;
-				int maxX = bPosition.x + m_width;
-
-				bool isY = position.y >= bPosition.y && position.y <= maxY;
-				bool isX = position.x >= bPosition.x && position.x <= maxX;
-
-				if (isX && isY)
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 				{
-					std::cout << " X : " << pcWindow->GetMousePos().x << " Y : " << pcWindow->GetMousePos().y << std::endl;
-					m_callback();
-				}
-			}
+					sf::Vector2i position = pcWindow->GetMousePos();
+					sf::Vector2f bPosition = m_rect.getPosition();
+					int maxY = bPosition.y + m_height;
+					int maxX = bPosition.x + m_width;
 
-			pcWindow->Draw(m_rect);
-			pcWindow->Draw(m_text);
+					bool isY = position.y >= bPosition.y && position.y <= maxY;
+					bool isX = position.x >= bPosition.x && position.x <= maxX;
+
+					if (isX && isY)
+					{
+						std::cout << " X : " << pcWindow->GetMousePos().x << " Y : " << pcWindow->GetMousePos().y << std::endl;
+						m_callback();
+						m_fProgress = 0.0f;
+					}
+				}
+
+				pcWindow->Draw(m_rect);
+				pcWindow->Draw(m_text);
+			}
 		}
 
 		sf::Vector2f GetPosition()
@@ -77,6 +82,7 @@ namespace Vi
 		sf::Text m_text;
 		int m_width;
 		int m_height;
+		float m_fProgress;
 	};
 
 };

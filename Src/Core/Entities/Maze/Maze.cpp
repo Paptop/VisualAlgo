@@ -49,7 +49,11 @@ Vi::Maze::Maze(std::string filename)
 
 void Vi::Maze::Reset()
 {
+	m_fProgress = 0.0f;
+	m_fDelay = 0.0f;
+
 	m_anim.clear();
+	m_path.clear();
 
 	for (int i = 0; i < (int)m_maze.size(); ++i)
 	{
@@ -138,7 +142,7 @@ void Vi::Maze::GenM(int row, int col)
 		int goal = dice();
 		if (goal == 6)
 		{
-			firstRow[i] = 0;
+			firstRow[i] = 3;
 		}
 	}
 
@@ -509,9 +513,10 @@ void Vi::Maze::Update(float fDelta)
 
 void Vi::Maze::GenMaze()
 {
+	Reset();
 	delete[] m_F;
 	m_maze.clear();
-	GenM(200, 150);
+	GenM(20, 15);
 
 	for (int i = 0; i < (int)m_mazeGO.size(); ++i)
 	{
@@ -552,23 +557,12 @@ void Vi::Maze::Astar()
 		int Y = queue.begin()->second.y;
 		int K = 0;
 
-		
-		for (auto p : queue)
-		{
-			std::cout << "First ->" << p.first << " Second -> " << " X : " << p.second.x << " Y : " << p.second.y << " Goal -> " << m_goal->GetId() << std::endl;
-		}
-
 		do
 		{
 			U = X + m_rules[K].x;
 			V = Y + m_rules[K].y;
 
 			int id = m_mazeGO[Y][X]->GetId();
-			
-			if (id == 8)
-			{
-				std::cout << " ID " << id << std::endl;
-			}
 
 			if (m_mazeGO[Y][X]->GetId() != waveLabel)
 			{
@@ -597,7 +591,9 @@ void Vi::Maze::Astar()
 				m_anim.back().push_back(m_mazeGO[V][U]);
 				waveLabel = PrevId;
 
-				if (U == 0 || U == m_mazeW - 1 || V == 0 || V == m_mazeH - 1)
+
+				if ( (m_goal->GetIndex().x == U && m_goal->GetIndex().y == V) ||
+					U == 0|| U == m_mazeW - 1 || V == 0 || V == m_mazeH - 1)
 				{
 					Yes = true;
 				}

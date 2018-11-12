@@ -12,6 +12,7 @@ namespace Vi
 {
 
 	class Tile;
+	class Agent;
 	class Camera;
 
 	class Maze : public Model
@@ -43,17 +44,20 @@ namespace Vi
 ////////////////////////////////////////////////////////////////////////////////////////
 		void WaveAlgo();
 		void Astar();
+		void QLearn();
 		void Back(int U, int V);
 	private:
 		void GenM(int x, int y);
 		void InitMaze();
 		void InitObjects();
+		void PrintQTable();
 		// TODO: create factory
 		Tile* CreateTile(Tiles id, int i, int j);
 	private:
 		std::vector< std::vector<int> > m_maze;
 		std::vector< std::vector<Tile*> > m_mazeGO;
 		std::vector< std::vector<Tile*> > m_anim;
+		std::vector< Tile* >			m_freeTiles;
 
 		Camera* m_pcCamera;
 		std::ifstream m_input;
@@ -83,6 +87,7 @@ namespace Vi
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 	public:
-		Tile* m_goal;
+		Tile*	m_goal;
+		Agent*	m_agent;
 	};
 }

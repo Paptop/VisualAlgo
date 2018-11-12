@@ -1,5 +1,6 @@
 #include "Src/Core/Entities/Maze/Maze.h"
 #include "Src/Core/Entities/Maze/Tiles/Tiles.h"
+#include "Src/Core/Entities/Maze/Tiles/Agent.h"
 #include "Src/Vi/Global/Consts.h"
 #include "Src/Core/Entities/Maze/Camera.h"
 #include "Src/Vi/Sys/GoManager.h"
@@ -38,12 +39,9 @@ Vi::Maze::Maze(std::string filename)
 	{
 		std::cout << "R" << m_R[i] << " ";
 	}
-	std::cout << std::endl << std::endl;
-	std::cout << "  3.4 Nodes: ";
-	for (int i = 0; i < m_nodes.size(); ++i)
-	{
-		std::cout << "[x=" << m_nodes[i].x + 1 << ", y=" << m_nodes[i].y + 1 << "]" << " ";
-	}
+	std::cout << std::endl;
+	std::cout << " ---  Q table --- " << std::endl;
+	PrintQTable();
 
 }
 
@@ -98,6 +96,7 @@ void Vi::Maze::InitMaze()
 			for (int i = 0; i < (int)line.length(); ++i)
 			{
 				row.push_back(line[i] - '0');
+				
 			}
 
 			m_maze.push_back(row);
@@ -190,6 +189,7 @@ void Vi::Maze::InitObjects()
 	for (int i = 0; i < (int)m_maze.size(); ++i)
 	{
 		std::vector<Tile*> tiles;
+		std::vector<float> initValues;
 		for (int j = 0; j < (int)m_maze[i].size(); ++j)
 		{
 			int id = m_maze[i][j];
@@ -204,6 +204,7 @@ void Vi::Maze::InitObjects()
 			Tile* tile = CreateTile((Tiles)id, i, j);
 			tile->SetPosition(m_maze.size() - i,j);
 			tiles.push_back(tile);
+			initValues.push_back(0.23f);
 		}
 		m_mazeGO.push_back(tiles);
     }
@@ -220,7 +221,6 @@ void Vi::Maze::InitObjects()
 		m_mazeGO[m_agentY][m_agentX]->SetId(2);
 	}
 }
-
 
 void Vi::Maze::PrintToConsole()
 {
@@ -267,12 +267,14 @@ Vi::Tile* Vi::Maze::CreateTile(Tiles id, int i, int j)
 	{
 		case SIMPLE_TILE:
 			tile = new SimpleTile();
+			m_freeTiles.push_back(tile);
 			break;
 		case WALL_TILE:
 			tile = new Wall();
 			break;
 		case AGENT:
-			tile = new Agent(this);
+			m_agent = new Agent(this);
+			tile = m_agent;
 			break;
 		case GOAL:
 			tile = new GoalTile();
@@ -650,4 +652,69 @@ void Vi::Maze::Astar()
 
 	std::reverse(m_anim.begin(), m_anim.end());
 	//std::reverse(m_path.begin(), m_path.end());
+}
+
+
+void Vi::Maze::QLearn()
+{
+	const float gamma = 0.8f;
+	// One episode
+	std::random_device r;
+	std::default_random_engine generator(r());
+	std::uniform_int_distribution<int> distribution(0, 3);
+	std::uniform_int_distribution<int> distributionFree(0, m_freeTiles.size() - 1);
+	auto dice = std::bind(distribution, generator);
+	auto diceFree = std::bind(distributionFree, generator);
+
+
+	for (int i = 0; i < 1000; ++i)
+	{
+		std::cout << " Epoch : " <<  i << std::endl;
+		bool isGoalReached = false;
+		Tile* tile = m_freeTiles[diceFree()];
+		PlaceAgent(tile->GetIndex().y, tile->GetIndex().x);
+
+		while (!isGoalReached)
+		{
+			Agent::RULES rule = static_cast<Agent::RULES>(dice());
+			sf::Vector2i nextState = m_agent->ApplyRule(rule);
+			float reward = m_agent->GetActionReward(rule);
+			std::vector<float> QvaluesNextState = m_agent->GetNextQValues(nextState.y, nextState.x);
+			std::sort(QvaluesNextState.begin(), QvaluesNextState.end(), std::greater<float>());
+			float MaxReward = (*QvaluesNextState.begin());
+			float UpdatedQValue = reward + gamma * MaxReward;
+			sf::Vector2i pos = m_agent->GetIndex();
+			Tile* tile = GetTile(pos.x, pos.y);
+			if (tile)
+			{
+				tile->UpdateQValue(UpdatedQValue);
+				isGoalReached = m_agent->MoveAgent(rule);
+				m_agent->Render();
+			}
+			std::cout << " UpdatedQValue : " << UpdatedQValue << std::endl;
+		}
+
+	}
+
+	PrintQTable();
+
+}
+
+void Vi::Maze::PrintQTable()
+{
+	if (m_maze.size() == 0)
+	{
+		return;
+	}
+
+	for (int i = (int)m_mazeGO.size() - 1; i >= 0; --i)
+	{
+		std::cout << " " << std::setfill(' ') << std::setw(3) << i + 1 << " | ";
+		for (Tile* tile : m_mazeGO[i])
+		{
+			std::cout << std::setfill(' ') << std::setw(10) << tile->GetQValue();
+		}
+
+		std::cout << std::endl;
+	}
 }

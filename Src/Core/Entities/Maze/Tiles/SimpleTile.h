@@ -12,7 +12,8 @@ namespace Vi
 		~SimpleTile();
 
 		bool IsSolid() { return false; }
-		int GetReward() { return 0; }
+		bool IsGoal() { return false; }
+		float GetReward() { return -1.0f; }
 
 		void Init();
 		void Reset();

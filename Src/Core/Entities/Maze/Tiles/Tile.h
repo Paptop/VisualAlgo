@@ -11,7 +11,8 @@ namespace Vi
 	{
 	public:
 		virtual bool IsSolid() = 0;
-		virtual int GetReward() = 0;
+		virtual bool IsGoal() = 0;
+		virtual float GetReward() = 0;
 		virtual void Reset(){}
 
 		inline int GetId()
@@ -123,6 +124,16 @@ namespace Vi
 			return dist;
 		}
 
+		void UpdateQValue(float value)
+		{
+			m_QValue = value;
+		}
+
+		float GetQValue()
+		{
+			return m_QValue;
+		}
+
 	protected:
 		int m_id;
 		sf::RectangleShape m_rect;
@@ -130,6 +141,7 @@ namespace Vi
 		// TODO Change to Vector2i in VI
 		sf::Vector2i m_pIndex;
 		bool m_isLabelHidden;
+		float m_QValue = 0.0f;
 
 	};
 

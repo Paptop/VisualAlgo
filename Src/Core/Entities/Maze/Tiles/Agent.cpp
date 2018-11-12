@@ -18,6 +18,90 @@ Vi::Agent::~Agent()
 	GOM.Remove(this);
 }
 
+bool Vi::Agent::MoveAgent(RULES rule)
+{
+	int newRow = m_pIndex.y + m_vRules[rule].y;
+	int newCol = m_pIndex.x + m_vRules[rule].x;
+
+	Tile* tile = m_pcMaze->GetTile(newRow, newCol);
+	if (!tile)
+	{
+		return false;
+	}
+
+	if (!tile->IsSolid())
+	{
+		sf::Vector2f pos = tile->GetPosition();
+
+		m_pIndex.x = newCol;
+		m_pIndex.y = newRow;
+
+		m_rect.setPosition(pos);
+		m_text.setPosition(pos);
+
+		if (tile->IsGoal())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+float Vi::Agent::GetActionReward(RULES rule)
+{
+	int newRow = m_pIndex.y + m_vRules[rule].y;
+	int newCol = m_pIndex.x + m_vRules[rule].x;
+
+	Tile* tile = m_pcMaze->GetTile(newRow, newCol);
+	if (tile)
+	{
+		return tile->GetReward();
+	}
+	else
+	{
+		return -100.0f;
+	}
+}
+
+
+std::vector<float> Vi::Agent::GetCurrentQValues()
+{
+	return GetNextQValues(m_pIndex.x, m_pIndex.y);
+}
+
+sf::Vector2i Vi::Agent::ApplyRule(RULES rule)
+{
+	sf::Vector2i res;
+	res.y = m_pIndex.y + m_vRules[rule].y;
+	res.x = m_pIndex.x + m_vRules[rule].x;
+	return res;
+}
+
+std::vector<float> Vi::Agent::GetNextQValues(int row, int col)
+{
+	std::vector<float> QRow;
+
+	for (int i = 0; i < m_vRules.size(); ++i)
+	{
+		int newRow = row + m_vRules[i].y;
+		int newCol = col + m_vRules[i].x;
+
+		Tile* tile = m_pcMaze->GetTile(newRow, newCol);
+		if (tile)
+		{
+			QRow.push_back(tile->GetQValue());
+		}
+		else
+		{
+			// Punish agent OOB
+			QRow.push_back(-100.0f);
+		}
+	}
+
+	return QRow;
+}
+
 void Vi::Agent::Update(float fDelta)
 {
 	m_fProgress += fDelta;
@@ -49,8 +133,6 @@ void Vi::Agent::Update(float fDelta)
 			int newRow = m_pIndex.y + m_vRules[m_eCurrentRule].y;
 			int newCol = m_pIndex.x + m_vRules[m_eCurrentRule].x;
 
-			float dist = GetDistance(*m_pcMaze->m_goal);
-			//std::cout << dist << std::endl;
 			Tile* tile = m_pcMaze->GetTile(newRow, newCol);
 			if (!tile)
 			{

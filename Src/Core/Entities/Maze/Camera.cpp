@@ -25,6 +25,7 @@ void Vi::Camera::InitButtons()
 	m_buttons.push_back(new Dummy(std::bind(&Vi::Maze::WaveAlgo, m_pcMaze), "Wave", 1));
 	m_buttons.push_back(new Dummy(std::bind(&Vi::Maze::Astar, m_pcMaze), "A*", 2));
 	m_buttons.push_back(new Dummy(std::bind(&Vi::Maze::GenMaze, m_pcMaze), "GenMaze", 3));
+	m_buttons.push_back(new Dummy(std::bind(&Vi::Maze::QLearn, m_pcMaze), "Qlearn", 4));
 }
 
 Vi::Camera::~Camera()

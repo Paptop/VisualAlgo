@@ -12,7 +12,8 @@ namespace Vi
 		~Wall();
 
 		bool IsSolid() { return true; }
-		int GetReward() { return 0; }
+		bool IsGoal() { return false; }
+		float GetReward() { return -10.0; }
 
 		void Reset();
 		void Init();

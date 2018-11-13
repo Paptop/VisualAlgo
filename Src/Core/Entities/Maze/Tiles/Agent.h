@@ -36,6 +36,8 @@ namespace Vi
 
 
 		sf::Vector2i ApplyRule(RULES rule);
+		sf::Vector2i GetNotVisitedState();
+
 		bool MoveAgent(RULES rule);
 		float GetActionReward(RULES rule);
 		std::vector<float> GetCurrentQValues();

@@ -5,6 +5,11 @@
 #include "Src/Vi/Global/Consts.h"
 #include "Src/Vi/Sys/ReManager.h"
 
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <sstream>
+
 namespace Vi
 {
 	class Tile : public GameObject
@@ -79,6 +84,13 @@ namespace Vi
 			m_text.setString(std::to_string(m_id));
 		}
 
+		void SetText(float value)
+		{
+			std::stringstream strs;
+			strs << std::fixed << std::setprecision(2) << value;
+			m_text.setString(strs.str());
+		}
+
 		void SetColor(int r, int g, int b, int a)
 		{
 			m_rect.setFillColor(sf::Color(r, g, b, a));
@@ -107,7 +119,7 @@ namespace Vi
 		{
 			m_text.setFont(RE.GetFont());
 			m_text.setFillColor(sf::Color::Green);
-			m_text.setCharacterSize(20);
+			m_text.setCharacterSize(15);
 			m_text.setOutlineColor(sf::Color::Black);
 			m_text.setOutlineThickness(1);
 			m_text.setStyle(sf::Text::Bold);
@@ -133,6 +145,9 @@ namespace Vi
 		{
 			return m_QValue;
 		}
+
+	public:
+		int visited = 5;
 
 	protected:
 		int m_id;

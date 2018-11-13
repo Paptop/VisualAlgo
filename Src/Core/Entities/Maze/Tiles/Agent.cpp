@@ -39,6 +39,11 @@ bool Vi::Agent::MoveAgent(RULES rule)
 		m_rect.setPosition(pos);
 		m_text.setPosition(pos);
 
+		if (tile->visited > 0)
+		{
+			tile->visited--;
+		}
+
 		if (tile->IsGoal())
 		{
 			return true;
@@ -70,11 +75,43 @@ std::vector<float> Vi::Agent::GetCurrentQValues()
 	return GetNextQValues(m_pIndex.x, m_pIndex.y);
 }
 
+sf::Vector2i Vi::Agent::GetNotVisitedState()
+{
+	for (int i = 0; i < m_vRules.size(); ++i)
+	{
+		int newRow = m_pIndex.x + m_vRules[i].y;
+		int newCol = m_pIndex.y + m_vRules[i].x;
+
+		Tile* tile = m_pcMaze->GetTile(newRow, newCol);
+		if (tile)
+		{
+			if (tile->visited == 0)
+			{
+				continue;
+			}
+			else
+			{
+				return { newCol,newRow };
+			}
+		}
+	}
+
+	return { -1,-1 };
+}
+
 sf::Vector2i Vi::Agent::ApplyRule(RULES rule)
 {
 	sf::Vector2i res;
 	res.y = m_pIndex.y + m_vRules[rule].y;
 	res.x = m_pIndex.x + m_vRules[rule].x;
+	Tile* tile = m_pcMaze->GetTile(res.y, res.x);
+	if (tile)
+	{
+		if (tile->visited == 0)
+		{
+			return { -1,-1 };
+		}
+	}
 	return res;
 }
 

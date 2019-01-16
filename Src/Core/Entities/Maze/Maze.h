@@ -36,6 +36,9 @@ namespace Vi
 		void SetOffset(float fOffsetX, float fOffsetY);
 		void Reset();
 		void PlaceAgent(int row, int col);
+		void PrintQTable();
+		void AnalyzeQLearn();
+
 		void GenMaze();
 		Tile* GetTile(int row, int col);
 
@@ -50,7 +53,8 @@ namespace Vi
 		void GenM(int x, int y);
 		void InitMaze();
 		void InitObjects();
-		void PrintQTable();
+
+
 		// TODO: create factory
 		Tile* CreateTile(Tiles id, int i, int j);
 	private:
@@ -82,6 +86,7 @@ namespace Vi
 
 		float m_fProgress;
 		float m_fDelay;
+		float m_fAverageScore;
 
 		int r, g, b;
 ///////////////////////////////////////////////////////////////////////////////////////

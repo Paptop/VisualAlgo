@@ -13,7 +13,7 @@ namespace Vi
 
 		bool IsSolid() { return true; }
 		bool IsGoal() { return false; }
-		float GetReward() { return -10.0; }
+		float GetReward() { return -10.0f; }
 
 		void Reset();
 		void Init();

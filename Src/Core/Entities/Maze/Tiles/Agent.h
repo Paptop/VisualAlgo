@@ -3,6 +3,8 @@
 
 #include "Src/Core/Entities/Maze/Tiles/Tile.h"
 
+#include <list>
+
 namespace Vi
 {
 	class Maze;
@@ -33,6 +35,8 @@ namespace Vi
 		void Render(Window* window);
 		void Reset();
 		void Init();
+		void PushCommand(RULES rule);
+		Tile* GetTile(sf::Vector2i startIndex, RULES rule);
 
 
 		sf::Vector2i ApplyRule(RULES rule);
@@ -45,6 +49,7 @@ namespace Vi
 
 	private:
 		std::vector< sf::Vector2i >			m_vRules;
+		std::list<RULES>					m_lActions;
 		RULES								m_eCurrentRule;
 		Maze*								m_pcMaze;
 		float								m_fProgress;

@@ -119,7 +119,7 @@ namespace Vi
 		{
 			m_text.setFont(RE.GetFont());
 			m_text.setFillColor(sf::Color::Green);
-			m_text.setCharacterSize(15);
+			m_text.setCharacterSize(12);
 			m_text.setOutlineColor(sf::Color::Black);
 			m_text.setOutlineThickness(1);
 			m_text.setStyle(sf::Text::Bold);
@@ -136,14 +136,52 @@ namespace Vi
 			return dist;
 		}
 
-		void UpdateQValue(float value)
+		void UpdateQValue(float value, int rule)
 		{
-			m_QValue = value;
+			m_QValue[rule] = value;
 		}
 
-		float GetQValue()
+		float GetQValue(int rule)
 		{
-			return m_QValue;
+			return m_QValue[rule];
+		}
+
+		/*
+			UP,
+			RIGHT
+			DOWN
+			LEFT
+		*/
+		std::string QToString()
+		{
+			std::string rules[4] = { "u", "r", "d", "l" };
+
+			std::stringstream ss;
+			ss << "tile [" << m_pIndex.x + 1 << "]" << " [" << m_pIndex.y + 1 << "] ";
+			for (int i = 0; i < 4; ++i)
+			{
+				ss << rules[i] << " " << m_QValue[i] << " ";
+			}
+			return ss.str();
+		}
+
+		std::pair<float,int> GetMaxQ()
+		{
+			std::pair<float, int> res;
+			float min = m_QValue[0];
+			int index = 0;
+
+			for (int i = 0; i < 4; ++i)
+			{
+				if (min <= m_QValue[i])
+				{
+					min = m_QValue[i];
+					index = i;
+				}
+			}
+			res.first = min;
+			res.second = index;
+			return res;
 		}
 
 	public:
@@ -156,7 +194,8 @@ namespace Vi
 		// TODO Change to Vector2i in VI
 		sf::Vector2i m_pIndex;
 		bool m_isLabelHidden;
-		float m_QValue = 0.0f;
+
+		float m_QValue[4];
 
 	};
 

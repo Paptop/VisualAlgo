@@ -24,6 +24,7 @@ bool Vi::Agent::MoveAgent(RULES rule)
 	int newCol = m_pIndex.x + m_vRules[rule].x;
 
 	Tile* tile = m_pcMaze->GetTile(newRow, newCol);
+
 	if (!tile)
 	{
 		return false;
@@ -38,11 +39,7 @@ bool Vi::Agent::MoveAgent(RULES rule)
 
 		m_rect.setPosition(pos);
 		m_text.setPosition(pos);
-
-		if (tile->visited > 0)
-		{
-			tile->visited--;
-		}
+		m_pcMaze->PlaceAgent(newRow, newCol);
 
 		if (tile->IsGoal())
 		{
@@ -65,8 +62,18 @@ float Vi::Agent::GetActionReward(RULES rule)
 	}
 	else
 	{
-		return -100.0f;
+		return 0.0f;
 	}
+}
+
+Vi::Tile* Vi::Agent::GetTile(sf::Vector2i startIndex, RULES rule)
+{
+	int newRow = startIndex.y + m_vRules[rule].y;
+	int newCol = startIndex.x + m_vRules[rule].x;
+
+	Tile* tile = m_pcMaze->GetTile(newRow, newCol);
+
+	return tile;
 }
 
 
@@ -105,13 +112,6 @@ sf::Vector2i Vi::Agent::ApplyRule(RULES rule)
 	res.y = m_pIndex.y + m_vRules[rule].y;
 	res.x = m_pIndex.x + m_vRules[rule].x;
 	Tile* tile = m_pcMaze->GetTile(res.y, res.x);
-	if (tile)
-	{
-		if (tile->visited == 0)
-		{
-			return { -1,-1 };
-		}
-	}
 	return res;
 }
 
@@ -119,21 +119,21 @@ std::vector<float> Vi::Agent::GetNextQValues(int row, int col)
 {
 	std::vector<float> QRow;
 
+	Tile* tile = m_pcMaze->GetTile(row, col);
+	if (tile)
+	{
+		//QRow.push_back(tile->GetQValue(i));
+	}
+	else
+	{
+		// Punish agent OOB
+		QRow.push_back(-100.0f);
+		return QRow;
+	}
+
 	for (int i = 0; i < m_vRules.size(); ++i)
 	{
-		int newRow = row + m_vRules[i].y;
-		int newCol = col + m_vRules[i].x;
-
-		Tile* tile = m_pcMaze->GetTile(newRow, newCol);
-		if (tile)
-		{
-			QRow.push_back(tile->GetQValue());
-		}
-		else
-		{
-			// Punish agent OOB
-			QRow.push_back(-100.0f);
-		}
+		QRow.push_back(tile->GetQValue(i));
 	}
 
 	return QRow;
@@ -144,25 +144,34 @@ void Vi::Agent::Update(float fDelta)
 	m_fProgress += fDelta;
 	if (m_fProgress > 0.08f)
 	{
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+		if (!m_lActions.empty())
 		{
-		    m_eCurrentRule = UP;
+			m_eCurrentRule = m_lActions.front();
+			m_lActions.pop_front();
 		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+		else
 		{
-			m_eCurrentRule = RIGHT;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-		{
-			m_eCurrentRule = DOWN;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-		{
-			m_eCurrentRule = LEFT;
-		}
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-		{
-			m_eCurrentRule = PLACE;
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			{
+				m_eCurrentRule = UP;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+			{
+				m_eCurrentRule = RIGHT;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+			{
+				m_eCurrentRule = DOWN;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+			{
+				m_eCurrentRule = LEFT;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+			{
+				m_eCurrentRule = PLACE;
+			}
 		}
 
 		if (m_eCurrentRule != IDLE && m_eCurrentRule != PLACE)
@@ -227,4 +236,9 @@ void Vi::Agent::Init()
 	   {0,1}, {1,0}, {0,-1}, {-1,0}
 	};
 
+}
+
+void Vi::Agent::PushCommand(RULES rule)
+{
+	m_lActions.push_back(rule);
 }

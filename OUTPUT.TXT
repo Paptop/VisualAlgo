@@ -1,0 +1,6 @@
+WAVE 0, label L="2". Initial position X=8, Y=6, NEWN=1
+
+WAVE 1, label L="3"
+	Close Close=1, X=8, Y=6.
+  		R1. X=7, Y=6. Free. NEWN=2.
+  		R2. X=8, Y=5. Wall.
